@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lan Blackout — Monte seu currículo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0A0B;
+    --surface:#161618;
+    --surface-2:#1F1F22;
+    --border:#2A2A2E;
+    --text:#EDEDEF;
+    --text-2:#A1A1AA;
+    --muted:#71717A;
+    --green:#22C55E;
+    --green-2:#16A34A;
+    --green-soft:rgba(34,197,94,.13);
+    /* tokens do papel (documento claro) */
+    --paper:#FFFFFF;
+    --ink:#16191D;
+    --ink-2:#3F4651;
+    --p-muted:#8A929C;
+    --p-line:#E6E8EC;
+    --p-green:#15803D;
+    --serif:"Instrument Serif", Georgia, serif;
+    --sans:"Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+    --shadow-paper:0 1px 2px rgba(0,0,0,.18), 0 18px 40px -16px rgba(0,0,0,.55), 0 40px 80px -40px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--sans); color:var(--text); background:var(--bg); -webkit-font-smoothing:antialiased}
+
+  .app{
+    min-height:100vh;
+    background:
+      radial-gradient(1000px 520px at 8% -12%, rgba(34,197,94,.12), transparent 58%),
+      radial-gradient(820px 480px at 108% 116%, rgba(34,197,94,.06), transparent 56%),
+      var(--bg);
+  }
+
+  /* ---------- Topbar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    padding:13px clamp(16px,4vw,40px);
+    background:rgba(10,10,11,.78); backdrop-filter:saturate(150%) blur(12px);
+    border-bottom:1px solid var(--border);
+  }
+  .brand{display:flex; align-items:center; gap:11px}
+  .brand-mark{
+    width:38px; height:38px; border-radius:11px; background:#0E0E10;
+    border:1px solid rgba(34,197,94,.35); color:var(--green);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 18px -2px rgba(34,197,94,.45), inset 0 0 12px -6px rgba(34,197,94,.6);
+  }
+  .brand-name{font-weight:800; font-size:16px; letter-spacing:1.5px; text-transform:uppercase; line-height:1}
+  .brand-name .g{color:var(--green)}
+  .brand-sub{font-size:11px; color:var(--text-2); letter-spacing:.4px; margin-top:3px}
+  .actions{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+
+  .btn{
+    font-family:var(--sans); font-size:14px; font-weight:600; border:none; border-radius:11px;
+    padding:11px 16px; cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+    transition:transform .15s, box-shadow .2s, background .2s, border-color .2s, opacity .2s;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-ai{background:var(--surface-2); color:var(--text); border:1px solid var(--border)}
+  .btn-ai:hover{border-color:var(--green)}
+  .btn-download{background:var(--green); color:#08130C; font-weight:700; box-shadow:0 8px 22px -10px rgba(34,197,94,.65)}
+  .btn-download:hover{box-shadow:0 11px 28px -8px rgba(34,197,94,.8)}
+  .btn[disabled]{opacity:.65; cursor:default}
+  .spinner{width:15px; height:15px; border-radius:50%; border:2px solid rgba(255,255,255,.3); border-top-color:currentColor; animation:spin .7s linear infinite}
+  .btn-download .spinner{border-color:rgba(8,19,12,.35); border-top-color:#08130C}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ---------- Layout ---------- */
+  .layout{
+    max-width:1200px; margin:0 auto;
+    padding:clamp(18px,3vw,34px) clamp(16px,4vw,40px) 60px;
+    display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(20px,3vw,38px); align-items:start;
+  }
+  @media (max-width:920px){ .layout{grid-template-columns:1fr} }
+
+  .intro{margin-bottom:20px}
+  .intro h1{font-family:var(--serif); font-size:clamp(30px,4.6vw,44px); line-height:1.04; margin:0 0 8px; font-weight:400}
+  .intro p{margin:0; color:var(--text-2); font-size:15px; max-width:48ch; line-height:1.55}
+
+  /* ---------- Form ---------- */
+  .form-card{background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:22px clamp(18px,2.4vw,26px); margin-bottom:18px}
+  .card-head{display:flex; align-items:baseline; gap:12px; margin-bottom:18px}
+  .card-num{font-family:var(--serif); font-size:15px; color:var(--green); background:var(--green-soft); width:30px; height:30px; border-radius:9px; flex:0 0 auto; display:flex; align-items:center; justify-content:center; transform:translateY(-2px)}
+  .card-title{font-size:16.5px; font-weight:700; letter-spacing:-.1px}
+  .card-hint{font-size:12.5px; color:var(--muted); margin-top:3px; font-weight:500}
+  .opt{color:var(--muted); font-weight:500}
+
+  .field{margin-bottom:14px}
+  .field:last-child{margin-bottom:0}
+  .field-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px}
+  label{display:block; font-size:13px; font-weight:600; color:var(--text-2); margin-bottom:6px}
+  input, textarea, select{
+    width:100%; font-family:var(--sans); font-size:14.5px; color:var(--text);
+    background:var(--surface-2); border:1px solid var(--border); border-radius:11px; padding:11px 13px;
+    transition:border-color .18s, box-shadow .18s, background .18s;
+  }
+  textarea{resize:vertical; min-height:78px; line-height:1.5}
+  input::placeholder, textarea::placeholder{color:#5C5F66}
+  input:focus, textarea:focus, select:focus{outline:none; border-color:var(--green); box-shadow:0 0 0 3px var(--green-soft)}
+  select{appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2371717A' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:34px}
+
+  .repeat-item{border:1px solid var(--border); border-radius:13px; padding:15px; margin-bottom:13px; background:rgba(255,255,255,.015)}
+  .repeat-item:last-of-type{margin-bottom:14px}
+  .repeat-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px}
+  .repeat-head span{font-size:12px; font-weight:700; color:var(--green); letter-spacing:.5px; text-transform:uppercase}
+  .btn-remove{background:none; border:none; cursor:pointer; font-family:var(--sans); font-size:12.5px; font-weight:600; color:var(--muted); padding:4px 8px; border-radius:7px; transition:.15s}
+  .btn-remove:hover{color:#F87171; background:rgba(248,113,113,.1)}
+  .btn-add{width:100%; background:none; border:1.5px dashed var(--border); border-radius:12px; color:var(--green); font-family:var(--sans); font-weight:600; font-size:14px; padding:12px; cursor:pointer; transition:.18s; display:flex; align-items:center; justify-content:center; gap:7px}
+  .btn-add:hover{border-color:var(--green); background:var(--green-soft)}
+
+  .ai-tip{display:flex; gap:11px; align-items:flex-start; background:var(--green-soft); border:1px solid rgba(34,197,94,.2); border-radius:14px; padding:14px 16px; margin-bottom:18px}
+  .ai-tip .ico{font-size:18px; line-height:1.4}
+  .ai-tip p{margin:0; font-size:13px; color:var(--text-2); line-height:1.5}
+  .ai-tip b{color:var(--text)}
+
+  /* ---------- Preview / Paper ---------- */
+  .preview{position:sticky; top:88px}
+  @media (max-width:920px){ .preview{position:static; top:auto} }
+  .preview-label{font-size:11.5px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); margin:2px 4px 10px; display:flex; align-items:center; gap:7px}
+  .preview-label::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green)}
+
+  .paper{background:var(--paper); border-radius:10px; overflow:hidden; box-shadow:var(--shadow-paper); color:var(--ink); position:relative; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+  .cv-strip{height:5px; background:linear-gradient(90deg, var(--green) 0%, var(--green-2) 58%, #0E1116 100%)}
+  .cv-body{padding:clamp(26px,4vw,44px); position:relative; z-index:2}
+
+  .cv-name{font-family:var(--serif); font-size:clamp(30px,4.4vw,40px); line-height:1.04; font-weight:400; letter-spacing:.2px; color:var(--ink)}
+  .cv-role{font-size:14px; font-weight:600; color:var(--p-green); margin-top:4px; letter-spacing:.2px}
+  .cv-contacts{font-size:12.5px; color:var(--ink-2); margin-top:10px; line-height:1.6}
+  .cv-divider{height:1px; background:var(--p-line); margin:18px 0}
+  .cv-section{margin-top:18px}
+  .cv-section:first-child{margin-top:0}
+  .cv-label{font-size:11px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase; color:var(--p-green); margin-bottom:9px; display:flex; align-items:center; gap:8px}
+  .cv-label::after{content:""; flex:1; height:1px; background:var(--p-line)}
+  .cv-summary{font-size:13px; line-height:1.6; color:var(--ink-2)}
+  .cv-entry{margin-bottom:13px}
+  .cv-entry:last-child{margin-bottom:0}
+  .cv-entry-top{display:flex; justify-content:space-between; align-items:baseline; gap:12px}
+  .cv-entry-role{font-size:13.5px; font-weight:700; color:var(--ink)}
+  .cv-entry-org{font-weight:500; color:var(--ink-2)}
+  .cv-entry-period{font-size:11.5px; color:var(--p-muted); white-space:nowrap; font-weight:500}
+  .cv-entry-desc{font-size:12.5px; line-height:1.55; color:var(--ink-2); margin-top:4px; white-space:pre-line}
+  .chips{display:flex; flex-wrap:wrap; gap:7px}
+  .chip{font-size:12px; font-weight:600; color:var(--p-green); background:var(--green-soft); border-radius:7px; padding:5px 11px}
+  .cv-lang{font-size:13px; color:var(--ink-2); margin-bottom:4px}
+  .cv-lang b{color:var(--ink); font-weight:600}
+  .ghost{color:#C2CAD2; font-style:normal}
+
+  /* marca d'água até pagar */
+  .watermark{position:absolute; inset:0; z-index:4; pointer-events:none; overflow:hidden}
+  .wm-grid{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-30deg); display:flex; flex-direction:column; gap:34px; width:160%}
+  .wm-grid span{font-weight:800; font-size:clamp(20px,4.4vw,38px); letter-spacing:5px; color:rgba(18,22,28,.07); text-align:center; white-space:nowrap}
+  .paper.paid .watermark{display:none}
+
+  .pulse{animation:pulse 1.3s ease}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 var(--green-soft)} 30%{box-shadow:0 0 0 4px var(--green-soft); border-color:var(--green)} 100%{box-shadow:0 0 0 0 transparent}}
+  .foot-note{font-size:12px; color:var(--muted); margin:14px 4px 0; line-height:1.5}
+  .foot-note b{color:var(--text-2)}
+
+  /* ---------- Toast ---------- */
+  .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:#08130C; border:1px solid rgba(34,197,94,.4); color:#fff; font-size:13.5px; font-weight:500; padding:12px 18px; border-radius:12px; box-shadow:0 14px 34px -12px rgba(0,0,0,.6); opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:300; max-width:90vw}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+  /* ---------- Checkout ---------- */
+  .modal-overlay{position:fixed; inset:0; z-index:200; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(5,5,7,.74); backdrop-filter:blur(6px)}
+  .modal-overlay[hidden]{display:none}
+  .modal{position:relative; width:100%; max-width:430px; background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:26px clamp(20px,4vw,28px); box-shadow:0 30px 80px -20px rgba(0,0,0,.75); max-height:92vh; overflow:auto}
+  .modal-close{position:absolute; top:14px; right:14px; width:32px; height:32px; border-radius:9px; border:none; cursor:pointer; background:var(--surface-2); color:var(--text-2); font-size:20px; line-height:1; display:flex; align-items:center; justify-content:center}
+  .modal-close:hover{color:var(--text)}
+  .modal-brand{display:flex; align-items:center; gap:8px; font-size:11.5px; font-weight:800; letter-spacing:1.5px; color:var(--text-2); text-transform:uppercase}
+  .modal-brand .dot{width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 10px var(--green)}
+  .modal h2{font-family:var(--serif); font-weight:400; font-size:28px; margin:12px 0 16px}
+  .order{display:flex; justify-content:space-between; align-items:center; gap:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:13px; padding:14px 16px; margin-bottom:16px}
+  .order-name{font-weight:700; font-size:14.5px}
+  .order-desc{font-size:12.5px; color:var(--text-2); margin-top:2px}
+  .order-price{font-size:20px; font-weight:800; color:var(--green); white-space:nowrap}
+  .pay-tabs{display:flex; gap:8px; margin-bottom:16px}
+  .pay-tab{flex:1; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-2); font-family:var(--sans); font-weight:600; font-size:13.5px; cursor:pointer; transition:.15s; display:flex; align-items:center; justify-content:center; gap:6px}
+  .pay-tab.active{border-color:var(--green); color:var(--text); background:var(--green-soft)}
+  .pay-panel[hidden]{display:none}
+  .qr{width:158px; height:158px; margin:0 auto 14px; background:#fff; border-radius:12px; padding:9px; display:flex; align-items:center; justify-content:center}
+  .pix-help{font-size:12.5px; color:var(--text-2); line-height:1.5; margin:0 0 8px}
+  .pix-help b{color:var(--text)}
+  .pix-code{font-family:ui-monospace,monospace; font-size:11px; color:var(--text-2); background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:10px; word-break:break-all; margin-bottom:10px}
+  .btn-copy{width:100%; padding:10px; border-radius:9px; border:1px solid var(--border); background:transparent; color:var(--green); font-family:var(--sans); font-weight:600; font-size:13px; cursor:pointer; transition:.15s}
+  .btn-copy:hover{background:var(--green-soft); border-color:var(--green)}
+  .card-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .btn-pay{width:100%; justify-content:center; background:var(--green); color:#08130C; font-weight:700; box-shadow:0 10px 26px -10px rgba(34,197,94,.6); margin-top:2px}
+  .btn-pay:hover{box-shadow:0 12px 30px -8px rgba(34,197,94,.72)}
+  .demo-note{font-size:11.5px; color:var(--muted); line-height:1.5; margin:12px 0 0; text-align:center}
+
+  @media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} }
+
+  /* ---------- Print ---------- */
+  @media print{
+    @page{margin:1.4cm}
+    body, .app{background:#fff}
+    .topbar, .workspace, .preview-label, .foot-note, .toast, .modal-overlay{display:none!important}
+    .layout{display:block; padding:0; max-width:none}
+    .preview{position:static!important}
+    .paper{box-shadow:none; border-radius:0}
+    .cv-body{padding:0}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v8"/><path d="M6.4 7a8 8 0 1 0 11.2 0"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">Lan <span class="g">Blackout</span></div>
+        <div class="brand-sub">Gráfica rápida · currículos profissionais</div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-ai" id="btn-ai"><span class="ai-content">✨ Revisar com IA</span></button>
+      <button class="btn btn-download" id="btn-download">Baixar currículo</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- ===================== FORM ===================== -->
+    <section class="workspace">
+      <div class="intro">
+        <h1>Monte seu currículo em minutos.</h1>
+        <p>Preencha os campos abaixo e veja seu currículo montar em tempo real. Revise a escrita com IA e baixe o PDF profissional, prontinho pra imprimir aqui na Lan Blackout.</p>
+      </div>
+
+      <div class="ai-tip">
+        <span class="ico">💡</span>
+        <p><b>Não precisa caprichar na escrita.</b> Palavras erradas aparecem sublinhadas em vermelho enquanto você digita. E o botão <b>Revisar com IA</b> corrige a ortografia e deixa o texto mais profissional automaticamente.</p>
+      </div>
+
+      <div class="form-card">
+        <div class="card-head"><div class="card-num">1</div><div><div class="card-title">Seus dados</div><div class="card-hint">Comece pelo básico — é o topo do currículo.</div></div></div>
+        <div class="field"><label for="f-nome">Nome completo</label><input id="f-nome" type="text" spellcheck="false" placeholder="Ex: Maria Silva Santos"></div>
+        <div class="field"><label for="f-cargo">Cargo ou profissão</label><input id="f-cargo" type="text" spellcheck="true" placeholder="Ex: Auxiliar Administrativo"></div>
+        <div class="field-row">
+          <div class="field"><label for="f-email">E-mail</label><input id="f-email" type="email" inputmode="email" spellcheck="false" placeholder="maria@email.com"></div>
+          <div class="field"><label for="f-telefone">Telefone / WhatsApp</label><input id="f-telefone" type="tel" inputmode="tel" spellcheck="false" placeholder="(47) 99999-9999"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="f-cidade">Cidade / Estado</label><input id="f-cidade" type="text" spellcheck="false" placeholder="Camboriú, SC"></div>
+          <div class="field"><label for="f-link">LinkedIn ou site <span class="opt">(opcional)</span></label><input id="f-link" type="text" spellcheck="false" placeholder="linkedin.com/in/maria"></div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="card-head"><div class="card-num">2</div><div><div class="card-title">Resumo profissional</div><div class="card-hint">Em poucas linhas: quem você é e o que faz de melhor.</div></div></div>
+        <div class="field"><label for="f-resumo">Sobre você</label><textarea id="f-resumo" rows="4" spellcheck="true" placeholder="Ex: Profissional organizado, com 3 anos de experiência em atendimento ao cliente e rotinas administrativas. Busco contribuir com agilidade e bom relacionamento em equipe."></textarea></div>
+      </div>
+
+      <div class="form-card">
+        <div class="card-head"><div class="card-num">3</div><div><div class="card-title">Experiência profissional</div><div class="card-hint">Comece pela mais recente. Pode adicionar quantas quiser.</div></div></div>
+        <div id="exp-list"></div>
+        <button class="btn-add" data-add="experiencias">+ Adicionar experiência</button>
+      </div>
+
+      <div class="form-card">
+        <div class="card-head"><div class="card-num">4</div><div><div class="card-title">Formação acadêmica</div><div class="card-hint">Cursos, faculdade, técnico, ensino médio…</div></div></div>
+        <div id="form-list"></div>
+        <button class="btn-add" data-add="formacoes">+ Adicionar formação</button>
+      </div>
+
+      <div class="form-card">
+        <div class="card-head"><div class="card-num">5</div><div><div class="card-title">Habilidades</div><div class="card-hint">Separe por vírgula — viram etiquetas no currículo.</div></div></div>
+        <div class="field"><label for="f-habilidades">Suas habilidades</label><textarea id="f-habilidades" rows="2" spellcheck="true" placeholder="Ex: Excel, Atendimento ao cliente, Organização, Trabalho em equipe"></textarea></div>
+      </div>
+
+      <div class="form-card">
+        <div class="card-head"><div class="card-num">6</div><div><div class="card-title">Idiomas <span class="opt">(opcional)</span></div><div class="card-hint">Se não tiver, é só pular esta parte.</div></div></div>
+        <div id="lang-list"></div>
+        <button class="btn-add" data-add="idiomas">+ Adicionar idioma</button>
+      </div>
+    </section>
+
+    <!-- ===================== PREVIEW ===================== -->
+    <section class="preview">
+      <div class="preview-label">Prévia do currículo</div>
+      <div class="paper" id="paper">
+        <div class="cv-strip"></div>
+        <div class="watermark" aria-hidden="true"><div class="wm-grid" id="wm"></div></div>
+        <div class="cv-body" id="cv-body"></div>
+      </div>
+      <p class="foot-note">🔒 A prévia tem marca d'água. Após o pagamento, o PDF sai limpo. <b>Escolha “Salvar como PDF” na janela de impressão.</b></p>
+    </section>
+  </main>
+</div>
+
+<!-- ===================== CHECKOUT ===================== -->
+<div class="modal-overlay" id="overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button class="modal-close" id="modal-close" aria-label="Fechar">&times;</button>
+    <div class="modal-brand"><span class="dot"></span> Lan Blackout</div>
+    <h2 id="modal-title">Finalizar pedido</h2>
+    <div class="order">
+      <div><div class="order-name">Currículo profissional</div><div class="order-desc">Arquivo PDF pronto pra imprimir</div></div>
+      <div class="order-price" id="order-price">R$ 9,90</div>
+    </div>
+    <div class="pay-tabs">
+      <button class="pay-tab active" data-pay="pix">⚡ Pix</button>
+      <button class="pay-tab" data-pay="card">💳 Cartão</button>
+    </div>
+
+    <div class="pay-panel" id="panel-pix">
+      <div class="qr">
+        <svg viewBox="0 0 100 100" width="140" height="140" shape-rendering="crispEdges">
+          <rect x="6" y="6" width="22" height="22" fill="#0a0a0a"/><rect x="11" y="11" width="12" height="12" fill="#fff"/><rect x="14" y="14" width="6" height="6" fill="#0a0a0a"/>
+          <rect x="72" y="6" width="22" height="22" fill="#0a0a0a"/><rect x="77" y="11" width="12" height="12" fill="#fff"/><rect x="80" y="14" width="6" height="6" fill="#0a0a0a"/>
+          <rect x="6" y="72" width="22" height="22" fill="#0a0a0a"/><rect x="11" y="77" width="12" height="12" fill="#fff"/><rect x="14" y="80" width="6" height="6" fill="#0a0a0a"/>
+          <g fill="#0a0a0a">
+            <rect x="34" y="10" width="5" height="5"/><rect x="44" y="10" width="5" height="5"/><rect x="54" y="16" width="5" height="5"/>
+            <rect x="34" y="34" width="5" height="5"/><rect x="40" y="40" width="5" height="5"/><rect x="50" y="34" width="5" height="5"/><rect x="60" y="44" width="5" height="5"/><rect x="70" y="38" width="5" height="5"/><rect x="80" y="48" width="5" height="5"/>
+            <rect x="10" y="40" width="5" height="5"/><rect x="16" y="50" width="5" height="5"/><rect x="10" y="60" width="5" height="5"/>
+            <rect x="34" y="60" width="5" height="5"/><rect x="44" y="66" width="5" height="5"/><rect x="54" y="60" width="5" height="5"/><rect x="64" y="70" width="5" height="5"/><rect x="74" y="64" width="5" height="5"/><rect x="84" y="74" width="5" height="5"/>
+            <rect x="40" y="80" width="5" height="5"/><rect x="50" y="86" width="5" height="5"/><rect x="60" y="84" width="5" height="5"/><rect x="84" y="34" width="5" height="5"/>
+          </g>
+        </svg>
+      </div>
+      <p class="pix-help">Abra o app do seu banco, escolha <b>Pix Copia e Cola</b> e cole o código abaixo:</p>
+      <div class="pix-code" id="pix-code">00020126360014BR.GOV.BCB.PIX0114+5547999120000520400005303986540509.905802BR5913LAN BLACKOUT6009CAMBORIU62070503***6304ABCD</div>
+      <button class="btn-copy" id="btn-copy">Copiar código Pix</button>
+    </div>
+
+    <div class="pay-panel" id="panel-card" hidden>
+      <div class="field"><label>Número do cartão</label><input type="text" inputmode="numeric" placeholder="0000 0000 0000 0000"></div>
+      <div class="card-grid">
+        <div class="field"><label>Validade</label><input type="text" placeholder="MM/AA"></div>
+        <div class="field"><label>CVV</label><input type="text" inputmode="numeric" placeholder="123"></div>
+      </div>
+      <div class="field"><label>Nome no cartão</label><input type="text" placeholder="Como está impresso"></div>
+    </div>
+
+    <button class="btn btn-pay" id="btn-pay">Confirmar pagamento</button>
+    <p class="demo-note">⚠️ Demonstração — nenhum valor é cobrado de verdade. Conecte um gateway (Mercado Pago / Pix) para receber pagamentos reais.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* =================================================================
+     CONFIGURAÇÃO — mude o preço aqui
+  ================================================================= */
+  const PRECO = 9.90;
+
+  /* ---------------- Estado ---------------- */
+  const state = {
+    nome:'', cargo:'', email:'', telefone:'', cidade:'', link:'',
+    resumo:'', habilidades:'',
+    experiencias:[], formacoes:[], idiomas:[]
+  };
+  let uid = 0;
+  const newId = () => 'id' + (++uid);
+  let paid = false;
+
+  state.experiencias.push({id:newId(), cargo:'', empresa:'', periodo:'', descricao:''});
+  state.formacoes.push({id:newId(), curso:'', instituicao:'', periodo:''});
+  state.idiomas.push({id:newId(), idioma:'', nivel:'Intermediário'});
+
+  /* ---------------- Helpers ---------------- */
+  const esc  = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const attr = s => esc(s).replace(/"/g,'&quot;');
+  const $ = id => document.getElementById(id);
+  const brl = v => 'R$ ' + v.toFixed(2).replace('.', ',');
+
+  /* marca d'água */
+  $('wm').innerHTML = Array.from({length:9}).map(()=>`<span>AMOSTRA · LAN BLACKOUT</span>`).join('');
+
+  /* ---------------- Campos fixos ---------------- */
+  ['nome','cargo','email','telefone','cidade','link','resumo','habilidades'].forEach(key=>{
+    const el = $('f-'+key);
+    el.addEventListener('input', ()=>{ state[key]=el.value; renderPreview(); });
+  });
+
+  /* ---------------- Listas repetíveis ---------------- */
+  function renderExp(){
+    $('exp-list').innerHTML = state.experiencias.map((x,i)=>`
+      <div class="repeat-item" data-id="${x.id}">
+        <div class="repeat-head"><span>Experiência ${i+1}</span>${state.experiencias.length>1?`<button type="button" class="btn-remove" data-remove="experiencias" data-id="${x.id}">Remover</button>`:''}</div>
+        <div class="field-row">
+          <div class="field"><label>Cargo</label><input data-field="cargo" value="${attr(x.cargo)}" spellcheck="true" placeholder="Ex: Vendedora"></div>
+          <div class="field"><label>Empresa</label><input data-field="empresa" value="${attr(x.empresa)}" spellcheck="true" placeholder="Ex: Loja Modelo"></div>
+        </div>
+        <div class="field"><label>Período</label><input data-field="periodo" value="${attr(x.periodo)}" spellcheck="false" placeholder="Ex: Jan 2022 – Atual"></div>
+        <div class="field"><label>O que você fazia</label><textarea data-field="descricao" rows="3" spellcheck="true" placeholder="Descreva suas atividades e conquistas. Ex: Atendimento ao cliente, organização do estoque e fechamento de caixa.">${esc(x.descricao)}</textarea></div>
+      </div>`).join('');
+  }
+  function renderForm(){
+    $('form-list').innerHTML = state.formacoes.map((x,i)=>`
+      <div class="repeat-item" data-id="${x.id}">
+        <div class="repeat-head"><span>Formação ${i+1}</span>${state.formacoes.length>1?`<button type="button" class="btn-remove" data-remove="formacoes" data-id="${x.id}">Remover</button>`:''}</div>
+        <div class="field"><label>Curso / Grau</label><input data-field="curso" value="${attr(x.curso)}" spellcheck="true" placeholder="Ex: Técnico em Administração"></div>
+        <div class="field-row">
+          <div class="field"><label>Instituição</label><input data-field="instituicao" value="${attr(x.instituicao)}" spellcheck="true" placeholder="Ex: SENAC"></div>
+          <div class="field"><label>Período</label><input data-field="periodo" value="${attr(x.periodo)}" spellcheck="false" placeholder="Ex: 2020 – 2022"></div>
+        </div>
+      </div>`).join('');
+  }
+  function renderLang(){
+    $('lang-list').innerHTML = state.idiomas.map((x,i)=>`
+      <div class="repeat-item" data-id="${x.id}">
+        <div class="repeat-head"><span>Idioma ${i+1}</span>${state.idiomas.length>1?`<button type="button" class="btn-remove" data-remove="idiomas" data-id="${x.id}">Remover</button>`:''}</div>
+        <div class="field-row">
+          <div class="field"><label>Idioma</label><input data-field="idioma" value="${attr(x.idioma)}" spellcheck="true" placeholder="Ex: Inglês"></div>
+          <div class="field"><label>Nível</label><select data-field="nivel">${['Básico','Intermediário','Avançado','Fluente','Nativo'].map(n=>`<option ${x.nivel===n?'selected':''}>${n}</option>`).join('')}</select></div>
+        </div>
+      </div>`).join('');
+  }
+  const renderers = {experiencias:renderExp, formacoes:renderForm, idiomas:renderLang};
+
+  function bindList(containerId, arrName){
+    const handler = e=>{
+      const item = e.target.closest('.repeat-item'); if(!item) return;
+      const field = e.target.dataset.field; if(!field) return;
+      const obj = state[arrName].find(o=>o.id===item.dataset.id);
+      if(obj){ obj[field]=e.target.value; renderPreview(); }
+    };
+    const c = $(containerId);
+    c.addEventListener('input', handler);
+    c.addEventListener('change', handler);
+  }
+  bindList('exp-list','experiencias');
+  bindList('form-list','formacoes');
+  bindList('lang-list','idiomas');
+
+  document.body.addEventListener('click', e=>{
+    const add = e.target.closest('[data-add]');
+    if(add){
+      const arr = add.dataset.add;
+      const blank = arr==='experiencias' ? {id:newId(),cargo:'',empresa:'',periodo:'',descricao:''}
+                  : arr==='formacoes'    ? {id:newId(),curso:'',instituicao:'',periodo:''}
+                  : {id:newId(),idioma:'',nivel:'Intermediário'};
+      state[arr].push(blank); renderers[arr](); renderPreview(); return;
+    }
+    const rm = e.target.closest('[data-remove]');
+    if(rm){ const arr = rm.dataset.remove; state[arr] = state[arr].filter(o=>o.id!==rm.dataset.id); renderers[arr](); renderPreview(); }
+  });
+
+  /* ---------------- Prévia ---------------- */
+  function renderPreview(){
+    const nome  = state.nome.trim()  ? esc(state.nome)  : `<span class="ghost">Seu Nome</span>`;
+    const cargo = state.cargo.trim() ? esc(state.cargo) : `<span class="ghost">Seu cargo ou profissão</span>`;
+    const contatos = [state.email, state.telefone, state.cidade, state.link].map(v=>v.trim()).filter(Boolean).map(esc).join('  ·  ');
+    const contatosHtml = contatos || `<span class="ghost">email@exemplo.com  ·  (00) 00000-0000  ·  Cidade, UF</span>`;
+
+    let html = `<div class="cv-name">${nome}</div><div class="cv-role">${cargo}</div><div class="cv-contacts">${contatosHtml}</div><div class="cv-divider"></div>`;
+
+    if(state.resumo.trim()) html += `<div class="cv-section"><div class="cv-label">Resumo</div><div class="cv-summary">${esc(state.resumo)}</div></div>`;
+
+    const exps = state.experiencias.filter(x=>x.cargo||x.empresa||x.periodo||x.descricao);
+    if(exps.length){
+      html += `<div class="cv-section"><div class="cv-label">Experiência</div>` + exps.map(x=>{
+        const role = [x.cargo?`<span class="cv-entry-role">${esc(x.cargo)}</span>`:'', x.empresa?`<span class="cv-entry-org"> · ${esc(x.empresa)}</span>`:''].join('');
+        return `<div class="cv-entry"><div class="cv-entry-top"><div>${role||'<span class="ghost">Cargo</span>'}</div>${x.periodo?`<div class="cv-entry-period">${esc(x.periodo)}</div>`:''}</div>${x.descricao?`<div class="cv-entry-desc">${esc(x.descricao)}</div>`:''}</div>`;
+      }).join('') + `</div>`;
+    }
+
+    const forms = state.formacoes.filter(x=>x.curso||x.instituicao||x.periodo);
+    if(forms.length){
+      html += `<div class="cv-section"><div class="cv-label">Formação</div>` + forms.map(x=>{
+        const role = [x.curso?`<span class="cv-entry-role">${esc(x.curso)}</span>`:'', x.instituicao?`<span class="cv-entry-org"> · ${esc(x.instituicao)}</span>`:''].join('');
+        return `<div class="cv-entry"><div class="cv-entry-top"><div>${role||'<span class="ghost">Curso</span>'}</div>${x.periodo?`<div class="cv-entry-period">${esc(x.periodo)}</div>`:''}</div></div>`;
+      }).join('') + `</div>`;
+    }
+
+    const skills = state.habilidades.split(',').map(s=>s.trim()).filter(Boolean);
+    if(skills.length) html += `<div class="cv-section"><div class="cv-label">Habilidades</div><div class="chips">${skills.map(s=>`<span class="chip">${esc(s)}</span>`).join('')}</div></div>`;
+
+    const langs = state.idiomas.filter(x=>x.idioma.trim());
+    if(langs.length) html += `<div class="cv-section"><div class="cv-label">Idiomas</div>${langs.map(x=>`<div class="cv-lang"><b>${esc(x.idioma)}</b> — ${esc(x.nivel)}</div>`).join('')}</div>`;
+
+    $('cv-body').innerHTML = html;
+  }
+
+  /* ---------------- Toast ---------------- */
+  let toastTimer;
+  function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3200); }
+
+  /* ---------------- Revisar com IA ---------------- */
+  const aiBtn = $('btn-ai');
+  function setAILoading(on){
+    const c = aiBtn.querySelector('.ai-content');
+    if(on){ aiBtn.disabled=true; c.innerHTML = `<span class="spinner"></span> Revisando…`; }
+    else  { aiBtn.disabled=false; c.textContent = '✨ Revisar com IA'; }
+  }
+  function pulse(el){ if(!el) return; el.classList.add('pulse'); setTimeout(()=>el.classList.remove('pulse'),1300); }
+
+  aiBtn.addEventListener('click', async ()=>{
+    const payload = {
+      resumo: state.resumo || '',
+      experiencias: state.experiencias.filter(x=>x.descricao && x.descricao.trim()).map(x=>({id:x.id, descricao:x.descricao}))
+    };
+    if(!payload.resumo.trim() && payload.experiencias.length===0){ toast('Escreva o resumo ou uma experiência para revisar.'); return; }
+
+    setAILoading(true);
+    try{
+      const prompt =
+        'Você é um revisor profissional de currículos em português do Brasil. ' +
+        'Revise os textos a seguir: corrija ortografia, acentuação, gramática e pontuação, e melhore levemente o tom para ficar profissional, claro e objetivo. ' +
+        'NÃO invente informações novas, mantenha o sentido original e um tamanho parecido. ' +
+        'Responda APENAS com um JSON válido, sem markdown e sem comentários, exatamente neste formato: ' +
+        '{"resumo":"texto revisado","experiencias":[{"id":"...","descricao":"texto revisado"}]}. ' +
+        'Mantenha os "id" exatamente como recebidos. Textos em JSON: ' + JSON.stringify(payload);
+
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ model:"claude-sonnet-4-6", max_tokens:1000, messages:[{role:"user", content:prompt}] })
+      });
+      if(!res.ok) throw new Error('http '+res.status);
+      const data = await res.json();
+      const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+      const s = text.indexOf('{'), e = text.lastIndexOf('}');
+      if(s===-1||e===-1) throw new Error('parse');
+      const parsed = JSON.parse(text.slice(s, e+1));
+
+      const changedExp = [];
+      if(typeof parsed.resumo==='string' && parsed.resumo.trim()){ state.resumo = parsed.resumo.trim(); $('f-resumo').value = state.resumo; }
+      if(Array.isArray(parsed.experiencias)){
+        parsed.experiencias.forEach(p=>{ const o=state.experiencias.find(x=>x.id===p.id); if(o && typeof p.descricao==='string' && p.descricao.trim()){ o.descricao=p.descricao.trim(); changedExp.push(o.id); } });
+        renderExp();
+      }
+      renderPreview();
+      pulse($('f-resumo'));
+      changedExp.forEach(id=>pulse(document.querySelector(`.repeat-item[data-id="${id}"] textarea[data-field="descricao"]`)));
+      toast('Pronto! Textos revisados com IA ✨');
+    }catch(err){ toast('Não consegui revisar agora. Tente de novo em instantes.'); }
+    finally{ setAILoading(false); }
+  });
+
+  /* =================================================================
+     PAGAMENTO / CHECKOUT
+  ================================================================= */
+  $('order-price').textContent = brl(PRECO);
+  function updateDownloadLabel(){ $('btn-download').textContent = paid ? 'Baixar PDF' : ('Baixar currículo · ' + brl(PRECO)); }
+  updateDownloadLabel();
+
+  function openCheckout(){ $('overlay').hidden = false; }
+  function closeCheckout(){ $('overlay').hidden = true; }
+
+  $('btn-download').addEventListener('click', ()=>{
+    if(paid){ window.print(); return; }
+    if(!state.nome.trim()){ toast('Preencha pelo menos seu nome antes de finalizar.'); $('f-nome').focus(); return; }
+    openCheckout();
+  });
+
+  $('modal-close').addEventListener('click', closeCheckout);
+  $('overlay').addEventListener('click', e=>{ if(e.target===$('overlay')) closeCheckout(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !$('overlay').hidden) closeCheckout(); });
+
+  /* abas Pix / Cartão */
+  document.querySelectorAll('.pay-tab').forEach(t=>{
+    t.addEventListener('click', ()=>{
+      document.querySelectorAll('.pay-tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      const m = t.dataset.pay;
+      $('panel-pix').hidden  = m!=='pix';
+      $('panel-card').hidden = m!=='card';
+    });
+  });
+
+  /* copiar código Pix */
+  $('btn-copy').addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText($('pix-code').textContent); }catch(_){}
+    toast('Código Pix copiado!');
+  });
+
+  /* confirmar pagamento */
+  $('btn-pay').addEventListener('click', ()=>{
+    const btn = $('btn-pay');
+    btn.disabled = true; btn.innerHTML = `<span class="spinner"></span> Confirmando…`;
+
+    /* =============================================================
+       👉 AQUI ENTRA A INTEGRAÇÃO REAL DO GATEWAY
+       Ex.: criar pagamento no Mercado Pago / gerar Pix no backend,
+       aguardar confirmação (webhook) e só então liberar o download.
+       Por enquanto, confirmação SIMULADA para demonstração:
+    ============================================================= */
+    setTimeout(()=>{
+      paid = true;
+      $('paper').classList.add('paid');   // remove a marca d'água
+      updateDownloadLabel();
+      btn.disabled = false; btn.textContent = 'Confirmar pagamento';
+      closeCheckout();
+      toast('Pagamento aprovado! Gerando seu currículo ✅');
+      setTimeout(()=>window.print(), 500);
+    }, 1300);
+  });
+
+  /* ---------------- Início ---------------- */
+  renderExp(); renderForm(); renderLang(); renderPreview();
+</script>
+</body>
+</html>
