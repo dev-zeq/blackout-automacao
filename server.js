@@ -17,6 +17,13 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import { randomUUID } from 'crypto';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
+import { writeFileSync, unlinkSync, mkdirSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const PDF_DIR = join(__dirname, 'public', 'pdfs');
+mkdirSync(PDF_DIR, { recursive: true });
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -228,6 +235,31 @@ app.post('/api/solicitar', async (req, res) => {
   } catch (err) {
     console.error('solicitar:', err);
     res.status(500).json({ erro: 'Erro ao enviar solicitação.' });
+  }
+});
+
+/* =====================================================================
+   4) UPLOAD DE PDF TEMPORÁRIO (Bez Clean — Orçamentos)
+   ===================================================================== */
+app.use('/pdfs', express.static(PDF_DIR));
+
+app.post('/upload-pdf', express.json({ limit: '12mb' }), (req, res) => {
+  try {
+    const { base64, nome } = req.body || {};
+    if (!base64) return res.status(400).json({ erro: 'base64 obrigatório' });
+
+    const fileName = `${randomUUID()}.pdf`;
+    const filePath = join(PDF_DIR, fileName);
+    writeFileSync(filePath, Buffer.from(base64, 'base64'));
+
+    // Auto-deletar após 4 horas
+    setTimeout(() => { try { unlinkSync(filePath); } catch {} }, 4 * 60 * 60 * 1000);
+
+    const baseUrl = process.env.PUBLIC_URL || 'https://blackout.ezstudio.com.br';
+    res.json({ ok: true, url: `${baseUrl}/pdfs/${fileName}` });
+  } catch (err) {
+    console.error('upload-pdf:', err);
+    res.status(500).json({ erro: 'Erro ao salvar PDF.' });
   }
 });
 
